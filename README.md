@@ -24,7 +24,7 @@ current.y1=10;</p>
 <p>&nbsp;</p>
 
 <p>// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Main screen<br />
-//--------------------------------------------------------------------------------------------------------------------------------------------</p>
+//----------------------------------------------------------------------------------------------------------------------------</p>
 
 <p>function setdisplay( width, height)</p>
 
@@ -50,7 +50,7 @@ function createsurface(width,height){<span style="line-height:1.6em">function lo
 function hitpp(surfacea, xa, ya, surfaceb, xb, yb, xa2, ya2, xb2, yb2){</p>
 
 <p>// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;GRAPHICS<br />
-//--------------------------------------------------------------------------------------------------------------------------------------------<br />
+//--------------------------------------------------------------------------------------------------------------------------<br />
 &nbsp;<br />
 function _hex(n){<span style="line-height:1.6em">function rgb( r, g, b){</span></p>
 
@@ -78,7 +78,7 @@ function _hex(n){<span style="line-height:1.6em">function rgb( r, g, b){</span><
 
 <p><span style="line-height:1.6em">//text</span></p>
 
-<p>//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+<p>//------------------------------------------------------------------------------------------------------------------</p>
 
 <p>var fontName=&quot;Arial&quot;;</p>
 
@@ -89,7 +89,7 @@ function setfont(fnt){</p>
 
 <p><span style="line-height:1.6em">//mouse code</span></p>
 
-<p>//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+<p>//--------------------------------------------------------------------------------------------------------------------</p>
 
 <p>var mouseX=0;<br />
 var mouseY=0;<br />
@@ -114,7 +114,7 @@ function handleTouchEnd(e){&nbsp;<br />
 &nbsp;<br />
 function handleTouchMove(e){<br />
 //keyboard code<br />
-//--------------------------------------------------------------------------------------------</p>
+//-------------------------------------------------------------------------------------------------------------------------</p>
 
 <p>var KEY_ESC&nbsp;&nbsp; &nbsp;=27;<br />
 var KEY_SPACE= 32; &nbsp;&nbsp; &nbsp;<br />
@@ -224,10 +224,12 @@ var KEY_SINGLE_QUOTE&nbsp;&nbsp; &nbsp; =222;</p>
 
 <p><span style="line-height:1.6em">// sound</span></p>
 
-<p>&nbsp;<br />
-function loadsound(filepath){<span style="line-height:1.6em">function playsound(sound){</span></p>
+<p>&nbsp;
+<br />
+function loadsound(filepath)<br />
+<span style="line-height:1.6em">function playsound(sound)</span></p>
 
-<p>&nbsp;&nbsp; &nbsp;sound.play();</p>
+<p>&nbsp;&nbsp; &nbsp;sound.play();</p><br />
 
 <p>&nbsp;</p>
 
