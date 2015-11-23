@@ -222,7 +222,8 @@ var KEY_BACK_SLASH&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; =220;<br />
 var KEY_CLOSE_BRAKET&nbsp;&nbsp; &nbsp; =221;<br />
 var KEY_SINGLE_QUOTE&nbsp;&nbsp; &nbsp; =222;</p>
 
-<p><span style="line-height:1.6em">// sound</span></p>
+<p><span style="line-height:1.6em">// sound</span><br />
+//-------------------------------------------------------------------------------------------------------------------------</p>
 
 <p>&nbsp;
 <br />
