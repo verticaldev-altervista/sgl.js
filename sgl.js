@@ -1,6 +1,5 @@
 // SGL.JS
 var display="";
-var D;
 var ticks;
 var fps;
 var fpsTimer;
