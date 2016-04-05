@@ -568,7 +568,7 @@ function touchzone(x,y,w,h){
 			if( touchX[i]<=(x+w))
 				if (touchY[i]>y)
 					if(touchY[i]<=(y+h))
-						return true;
+						return i;
 	}
   return false;
 }
