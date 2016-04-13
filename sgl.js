@@ -166,32 +166,34 @@ function paste( target, x, y, surface, angle, zoom, alpha){
 //--------------------------------------------------------------------------------------------------------------------------------------------
  
 // surfaces collisions
-function hit(surfacea, xa, ya, surfaceb, xb, yb, xa2, ya2, xb2, yb2){
+function hit(surfacea, xa, ya, surfaceb, xb, yb, zooma, zoomb, wa, ha, wb, hb){
 	var cc=0;
-	
-	if(!xa2)var xa2=xa+surfacea.width;
-	if(!ya2)var ya2=ya+surfacea.height;
-	if(!xb2)var xb2=xb+surfaceb.width;
-	if(!yb2)var yb2=yb+surfaceb.height;
+	 if(!zooma)zooma=100;
+	 if(!zoomb)zoomb=100;
+    
+	if(!wa)wa=surfacea.width*zooma/100;
+	if(!ha)ha=surfacea.height*zooma/100;
+	if(!wb)wb=surfaceb.width*zoomb/100;
+	if(!hb)hb=surfaceb.height*zoomb/100;
 	
 	//for debug
-	//box(display,xa,ya,xa2-xa,ya2-ya,"#00ff00");
-	//box(display,xb,yb,xb2-xb,yb2-yb,"#00ff00");
+	//box(display,xa,ya,wa,ha,"#00ff00");
+	//box(display,xb,yb,wb,hb,"#00ff00");
 
 	if (xa<xb){
-		if(xa2 >xb)
+		if((xa+wa) >xb)
 			cc+=1;
 	}
 	else{
-		if(xb2 >xa)
+		if((xb+wb) >xa)
 			cc+=1;
 	}
 	if (ya<yb){
-		if(ya2 >yb)
+		if((ya+ha) >yb)
 			cc+=1;
 	}
 	else{
-		if(yb2 >ya)
+		if((yb+hb) >ya)
 			cc+=1;
 	}
 	
@@ -201,50 +203,54 @@ function hit(surfacea, xa, ya, surfaceb, xb, yb, xa2, ya2, xb2, yb2){
 //--------------------------------------------------------------------------------------------------------------------------------------------
  
 // pixel precision surfaces collisions
-function hitpp(surfacea, xa, ya, surfaceb, xb, yb, xa2, ya2, xb2, yb2){
-	var xa2,ya2,xb2,yb2; //optional values
+function hitpp(surfacea, xa, ya, surfaceb, xb, yb, zooma, zoomb, wa, ha, wb, hb){
 	var xaa,yaa,xbb,ybb;
 	var xw,yh;
 	var x,y;
 	var cc;
 	var colorkey="#000000";
  
-
-	if(!xa2)xa2=xa+surfacea.width;
-	if(!ya2)ya2=ya+surfacea.height;
-	if(!xb2)xb2=xb+surfaceb.width;
-	if(!yb2)yb2=yb+surfaceb.height;
+	 if(!zooma)zooma=100;
+	 if(!zoomb)zoomb=100;
+    
+	if(!wa)wa=surfacea.width*zooma/100;
+	if(!ha)ha=surfacea.height*zooma/100;
+	if(!wb)wb=surfaceb.width*zoomb/100;
+	if(!hb)hb=surfaceb.height*zoomb/100;
 	
 	//for debug
-	//box(display,xa,ya,xa2-xa,ya2-ya,"#00ff00");
-	//box(display,xb,yb,xb2-xb,yb2-yb,"#00ff00");
+	//box(display,xa,ya,wa,ha,"#00ff00");
+	//box(display,xb,yb,wb,hb,"#00ff00");
+	
+    if (hit(surfacea, xa, ya, surfaceb, xb, yb, zooma, zoomb, wa, ha, wb, hb)){
+	
+		xaa=0;
+		xbb=0;
+		if (xa<xb)
+			xaa=Math.max( xa, xb)-Math.min( xa, xb);
+		else
+			xbb=Math.max( xa, xb)-Math.min( xa, xb);
 
-	xaa=0;
-	xbb=0;
-	if (xa<xb)
-		xaa=Math.max(xa,xb)-Math.min(xa,xb);
-	else
-		xbb=Math.max(xa,xb)-Math.min(xa,xb);
+		yaa=0;
+		ybb=0;
+		if (ya<yb)
+			yaa=Math.max(ya, yb)-Math.min( ya, yb);
+		else
+			ybb=Math.max(ya,yb)-Math.min(ya,yb);
 
-	yaa=0;
-	ybb=0;
-	if (ya<yb)
-		yaa=Math.max(ya,yb)-Math.min(ya,yb);
-	else
-		ybb=Math.max(ya,yb)-Math.min(ya,yb);
+		xw=Math.min(wa*100/zooma,wb*100/zoomb);
+		yh=Math.min(ha*100/zooma,hb*100/zoomb);
 
-	xw=Math.min(xa2,xb2)-Math.max(xa,xb);
-	yh=Math.min(ya2,yb2)-Math.max(ya,yb);
-
-	for (y=0; y<yh; y++){
-		for (x=0; x<xw; x++){
-			if(getpixel(surfacea,xaa+x,yaa+y)!=colorkey){
-				if(getpixel(surfaceb,xbb+x,ybb+y)!=colorkey){
-					return 1;
+		for (y=0; y<yh; y++){
+			for (x=0; x<xw; x++){
+				if(getpixel(surfacea,(xaa*100/zooma)+(x*100/zooma),(yaa*100/zooma)+(y*100/zooma))!=colorkey){
+					if(getpixel(surfaceb,(xbb*100/zoomb)+(x*100/zoomb),(ybb*100/zoomb)+(y*100/zoomb))!=colorkey){
+						return 1;
+					}
 				}
 			}
 		}
-	}
+    }
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -732,6 +738,8 @@ function playsound(sound){
 current.col.foreground="#000000";
 current.col.background="#ffffff";
 current.size=16;
+
+document.write("<script src = 'main.js?"+Math.floor(Date.now() / 1000)+"'></script>");
 
 setdisplay();
  
