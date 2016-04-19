@@ -739,7 +739,7 @@ current.col.foreground="#000000";
 current.col.background="#ffffff";
 current.size=16;
 
-document.write("<script src = 'main.js?"+Math.floor(Date.now() / 1000)+"'></script>");
 
 setdisplay();
+document.write("<script src = 'main.js?"+Math.floor(Date.now() / 1000)+"'></script>");
  
