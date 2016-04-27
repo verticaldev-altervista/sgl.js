@@ -2,6 +2,7 @@
 var display="";
 var ticks;
 var fps;
+var fas;
 var fpsTimer;
 var _zoom;
 
@@ -48,15 +49,22 @@ function setdisplay( width, height){
 	display.addEventListener('touchend', handleTouchEnd, false);
 	display.addEventListener('touchmove',handleTouchMove , false);
 	//'dragstart', 'dragmove', 'dragend'
-	setfps(50);
+	setfps();
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 // SETFPS 
 function setfps(fps){
-	var milliseconds =1000 / fps;
-	if (fpsTimer)clearInterval(fpsTimer);
-	fpsTimer=self.setInterval( _update, milliseconds);
+	if (fps!=null){
+		var milliseconds =1000 / fps;
+		if (fpsTimer)clearInterval(fpsTimer);
+		fpsTimer=self.setInterval( _update, milliseconds);
+		fas=false;
+	}
+	else{
+		fpsTimer=requestAnimationFrame(_update);
+		fas=true;
+	}
 	var d = new Date();
 	ticks = d.getTime();
 }
@@ -70,6 +78,7 @@ function _update(){
 	var d = new Date();
 	ticks = d.getTime() ;
 	fps=Math.round(1000 /(ticks-oldt));
+	if (fas==true)requestAnimationFrame(_update);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
  
