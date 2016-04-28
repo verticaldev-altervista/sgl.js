@@ -504,14 +504,8 @@ var mouseY=0;
 var mouseB=0;
 
 function handleMouseMove( e){
-	if(e.offsetX){
-		mouseX = e.offsetX/document.body.style.zoom;
-		mouseY = e.offsetY/document.body.style.zoom;
-	}
-	else if(e.layerX){
-		mouseX = e.layerX/document.body.style.zoom;
-		mouseY = e.layerY/document.body.style.zoom;
-	}
+	mouseX = e.clientX/document.body.style.zoom;
+	mouseY = e.clientY/document.body.style.zoom;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
  
@@ -746,7 +740,6 @@ function playsound(sound){
 current.col.foreground="#000000";
 current.col.background="#ffffff";
 current.size=16;
-
 
 setdisplay();
 document.write("<script src = 'main.js?"+Math.floor(Date.now() / 1000)+"'></script>");
