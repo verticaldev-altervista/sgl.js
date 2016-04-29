@@ -49,13 +49,13 @@ function setdisplay( width, height){
 	display.addEventListener('touchend', handleTouchEnd, false);
 	display.addEventListener('touchmove',handleTouchMove , false);
 	//'dragstart', 'dragmove', 'dragend'
-	setfps();
+	setfps(null);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 // SETFPS 
 function setfps(fps){
-	if (fps!=null){
+	if (fps!==null){
 		var milliseconds =1000 / fps;
 		if (fpsTimer)clearInterval(fpsTimer);
 		fpsTimer=self.setInterval( _update, milliseconds);
