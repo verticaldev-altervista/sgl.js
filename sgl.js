@@ -118,6 +118,22 @@ function loadsurface(filepath){
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+function savearea(target,x,y,w,h){
+  var s=createsurface(320,320);
+  blt(s,0,0,w,h,target,x,y,w,h);
+  savesurface(s);
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+function savesurface(target) {
+  const imageData = target.toDataURL('image/png');
+  const a = document.createElement('a');
+  a.href = imageData;
+  a.download = 'surface.png';
+  a.click();
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 function blt( target,  xdest,  ydest, wdest, hdest, surface, xsource, ysource, wsource, hsource){
 	if (target==null)target=current.target;
 	if (surface==null)surface=current.surface;
