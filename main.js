@@ -1,4 +1,4 @@
-setdisplay
+setdisplay();
 
 function update(){
 		cls();
