@@ -1,10 +1,10 @@
 # sgl.js
-Simple Games Library javascript edition
+## Simple Games Library javascript Edition
 
 # SGL.JS reference
 
-// SCREEN
-//----------------------------------------------------------------------------------------------------------------------------
+SCREEN
+----------------------------------------------------------------------------------------------------------------------------
 
 function setdisplay( width, height)
 
