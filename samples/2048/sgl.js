@@ -1,8 +1,10 @@
 // SGL.JS
 var display="";
-var D;
 var ticks;
 var fps;
+var fas;
+var fpsTimer;
+var _zoom;
 
 var current=new Array();
 current.canvas=new Array();
@@ -17,21 +19,29 @@ current.x1=10;
 current.y1=10;
 
 
-
-
-
 //                              Main screen
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 function setdisplay( width, height){
+	if (display!=''){
+		const parent = display.parentNode;
+		parent.removeChild(display);
+}
 	if (! width) var width=window.innerWidth-20;
 	if (! height)var height=window.innerHeight-20;
 	if (display!=""){
 		display.width=width;
 		display.height=height;
 	}
-	document.write("<canvas id='display' width='"+width+"' height='"+height+"'></canvas>");
-
+	document.write("<canvas id='display' width='"+width+"' height='"+height+"' ></canvas>");
+	if (window.innerHeight/height < window.innerWidth/width){
+		_zoom =""+ (window.innerHeight-30)/height;
+	}
+	else{
+		_zoom =""+ (window.innerWidth-30)/width;
+	}
+	document.body.style.zoom=_zoom;
+	
 	display = document.getElementById("display");
 	current.target = display;
 	
@@ -43,14 +53,22 @@ function setdisplay( width, height){
 	display.addEventListener('touchend', handleTouchEnd, false);
 	display.addEventListener('touchmove',handleTouchMove , false);
 	//'dragstart', 'dragmove', 'dragend'
-	setfps(50);
+	setfps(null);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 // SETFPS 
 function setfps(fps){
-	var milliseconds =1000 / fps;
-	self.setInterval( _update, milliseconds);
+	if (fps!==null){
+		var milliseconds =1000 / fps;
+		if (fpsTimer)clearInterval(fpsTimer);
+		fpsTimer=self.setInterval( _update, milliseconds);
+		fas=false;
+	}
+	else{
+		fpsTimer=requestAnimationFrame(_update);
+		fas=true;
+	}
 	var d = new Date();
 	ticks = d.getTime();
 }
@@ -58,11 +76,13 @@ function setfps(fps){
 
 // UPDATE 
 function _update(){
-	var oldt=ticks
+	var oldt=ticks;
+	document.body.style.zoom=_zoom;
 	if(self.update) update();	
 	var d = new Date();
 	ticks = d.getTime() ;
 	fps=Math.round(1000 /(ticks-oldt));
+	if (fas==true)requestAnimationFrame(_update);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
  
@@ -93,6 +113,8 @@ function loadsurface(filepath){
 		var ctx=surface.getContext("2d");
 		ctx.drawImage(image,0,0);
 	}
+	surface.width=image.width;
+	surface.height=image.height;
 	
 	current.filepath=filepath;
 	current.surface=surface;
@@ -100,12 +122,39 @@ function loadsurface(filepath){
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+function savearea(target,x,y,w,h){
+  var s=createsurface(320,320);
+  blt(s,0,0,w,h,target,x,y,w,h);
+  savesurface(s);
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+function savesurface(target) {
+  const imageData = target.toDataURL('image/png');
+  const a = document.createElement('a');
+  a.href = imageData;
+  a.download = 'surface.png';
+  a.click();
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 function blt( target,  xdest,  ydest, wdest, hdest, surface, xsource, ysource, wsource, hsource){
 	if (target==null)target=current.target;
 	if (surface==null)surface=current.surface;
+	
+	if(xdest==null)xdest=0;
+	if(ydest==null)ydest=0;
+	if(wdest==null)wdest=target.width;
+	if(hdest==null)hdest=target.height;
+	
+	if(xsource==null)xsource=0;
+	if(ysource==null)ysource=0;
+	if(wsource==null)wsource=surface.width;
+	if(hsource==null)hsource=surface.height;
+	
 
 	var ctx=target.getContext("2d");
-	ctx.drawImage(surface,xsource,ysource, wsource,hsource,xdest,ydest,wdest,hdest);
+	ctx.drawImage( surface, xsource, ysource, wsource, hsource, xdest, ydest, wdest, hdest);
 
 	current.target=target;
 	current.surface=surface;
@@ -113,14 +162,30 @@ function blt( target,  xdest,  ydest, wdest, hdest, surface, xsource, ysource, w
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-function paste( target, x, y, surface){
+function paste( target, x, y, surface, angle, zoom, alpha){
 	if (target==null)target=current.target;
 	if (surface==null)surface=current.surface;
 	if (x==null)x=current.x1;
 	if (y==null)y=current.y1;
 
-	var ctx=target.getContext("2d");
-	ctx.drawImage(surface,x,y);
+    if (angle==null)angle=0;
+    if (zoom==null)zoom=100;
+    if (alpha==null)alpha=100;
+
+  	var ctx=target.getContext('2d');
+  	ctx.globalAlpha = alpha/100;
+        var rangle=angle*6.28 / 360;
+  	ctx.translate(x,y);
+  	ctx.rotate( rangle );
+  	var ssw=surface.width*zoom /100;
+    var ssh=surface.height*zoom /100;
+    if (zoom==-1){
+		ssw=target.width;
+		ssh=target.height;
+	}
+	ctx.drawImage( surface, 0, 0, surface.width, surface.height, 0-ssw/2, 0-ssh/2, ssw, ssh );
+  	ctx.rotate( -rangle );
+   	ctx.translate(-x,-y);
 
 	current.target=target;
 	current.surface=surface;
@@ -130,32 +195,34 @@ function paste( target, x, y, surface){
 //--------------------------------------------------------------------------------------------------------------------------------------------
  
 // surfaces collisions
-function hit(surfacea, xa, ya, surfaceb, xb, yb, xa2, ya2, xb2, yb2){
+function hit(surfacea, xa, ya, surfaceb, xb, yb, zooma, zoomb, wa, ha, wb, hb){
 	var cc=0;
-	
-	if(!xa2)var xa2=xa+surfacea.width;
-	if(!ya2)var ya2=ya+surfacea.height;
-	if(!xb2)var xb2=xb+surfaceb.width;
-	if(!yb2)var yb2=yb+surfaceb.height;
+	 if(!zooma)zooma=100;
+	 if(!zoomb)zoomb=100;
+    
+	if(!wa)wa=surfacea.width*zooma/100;
+	if(!ha)ha=surfacea.height*zooma/100;
+	if(!wb)wb=surfaceb.width*zoomb/100;
+	if(!hb)hb=surfaceb.height*zoomb/100;
 	
 	//for debug
-	//box(display,xa,ya,xa2-xa,ya2-ya,"#00ff00");
-	//box(display,xb,yb,xb2-xb,yb2-yb,"#00ff00");
+	//box(display,xa,ya,wa,ha,"#00ff00");
+	//box(display,xb,yb,wb,hb,"#00ff00");
 
 	if (xa<xb){
-		if(xa2 >xb)
+		if((xa+wa) >xb)
 			cc+=1;
 	}
 	else{
-		if(xb2 >xa)
+		if((xb+wb) >xa)
 			cc+=1;
 	}
 	if (ya<yb){
-		if(ya2 >yb)
+		if((ya+ha) >yb)
 			cc+=1;
 	}
 	else{
-		if(yb2 >ya)
+		if((yb+hb) >ya)
 			cc+=1;
 	}
 	
@@ -165,50 +232,54 @@ function hit(surfacea, xa, ya, surfaceb, xb, yb, xa2, ya2, xb2, yb2){
 //--------------------------------------------------------------------------------------------------------------------------------------------
  
 // pixel precision surfaces collisions
-function hitpp(surfacea, xa, ya, surfaceb, xb, yb, xa2, ya2, xb2, yb2){
-	var xa2,ya2,xb2,yb2; //optional values
+function hitpp(surfacea, xa, ya, surfaceb, xb, yb, zooma, zoomb, wa, ha, wb, hb){
 	var xaa,yaa,xbb,ybb;
 	var xw,yh;
 	var x,y;
 	var cc;
 	var colorkey="#000000";
  
-
-	if(!xa2)xa2=xa+surfacea.width;
-	if(!ya2)ya2=ya+surfacea.height;
-	if(!xb2)xb2=xb+surfaceb.width;
-	if(!yb2)yb2=yb+surfaceb.height;
+	 if(!zooma)zooma=100;
+	 if(!zoomb)zoomb=100;
+    
+	if(!wa)wa=surfacea.width*zooma/100;
+	if(!ha)ha=surfacea.height*zooma/100;
+	if(!wb)wb=surfaceb.width*zoomb/100;
+	if(!hb)hb=surfaceb.height*zoomb/100;
 	
 	//for debug
-	//box(display,xa,ya,xa2-xa,ya2-ya,"#00ff00");
-	//box(display,xb,yb,xb2-xb,yb2-yb,"#00ff00");
+	//box(display,xa,ya,wa,ha,"#00ff00");
+	//box(display,xb,yb,wb,hb,"#00ff00");
+	
+    if (hit(surfacea, xa, ya, surfaceb, xb, yb, zooma, zoomb, wa, ha, wb, hb)){
+	
+		xaa=0;
+		xbb=0;
+		if (xa<xb)
+			xaa=Math.max( xa, xb)-Math.min( xa, xb);
+		else
+			xbb=Math.max( xa, xb)-Math.min( xa, xb);
 
-	xaa=0;
-	xbb=0;
-	if (xa<xb)
-		xaa=Math.max(xa,xb)-Math.min(xa,xb);
-	else
-		xbb=Math.max(xa,xb)-Math.min(xa,xb);
+		yaa=0;
+		ybb=0;
+		if (ya<yb)
+			yaa=Math.max(ya, yb)-Math.min( ya, yb);
+		else
+			ybb=Math.max(ya,yb)-Math.min(ya,yb);
 
-	yaa=0;
-	ybb=0;
-	if (ya<yb)
-		yaa=Math.max(ya,yb)-Math.min(ya,yb);
-	else
-		ybb=Math.max(ya,yb)-Math.min(ya,yb);
+		xw=Math.min(wa*100/zooma,wb*100/zoomb);
+		yh=Math.min(ha*100/zooma,hb*100/zoomb);
 
-	xw=Math.min(xa2,xb2)-Math.max(xa,xb);
-	yh=Math.min(ya2,yb2)-Math.max(ya,yb);
-
-	for (y=0; y<yh; y++){
-		for (x=0; x<xw; x++){
-			if(getpixel(surfacea,xaa+x,yaa+y)!=colorkey){
-				if(getpixel(surfaceb,xbb+x,ybb+y)!=colorkey){
-					return 1;
+		for (y=0; y<yh; y++){
+			for (x=0; x<xw; x++){
+				if(getpixel(surfacea,(xaa*100/zooma)+(x*100/zooma),(yaa*100/zooma)+(y*100/zooma))!=colorkey){
+					if(getpixel(surfaceb,(xbb*100/zoomb)+(x*100/zoomb),(ybb*100/zoomb)+(y*100/zoomb))!=colorkey){
+						return 1;
+					}
 				}
 			}
 		}
-	}
+    }
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -235,8 +306,8 @@ function cls( target, col){
 
 	var ctx=target.getContext("2d");
 	ctx.fillStyle=col;
-	ctx.clearRect(0,0,display.width,target.height);
-	ctx.fillRect(0,0,display.width,target.height);	
+	ctx.clearRect(0,0,target.width,target.height);
+	ctx.fillRect(0,0,target.width,target.height);	
 
 	current.target=target;
 	current.col.background=col;
@@ -412,6 +483,14 @@ function fillcircle( target, vx, vy, r, col){
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+function paint(target, x, y, color) {
+  const ctx = target.getContext('2d');
+
+  ctx.fillStyle = color;
+  ctx.fill(x, y);
+}
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 //text
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -453,14 +532,8 @@ var mouseY=0;
 var mouseB=0;
 
 function handleMouseMove( e){
-	if(e.offsetX){
-		mouseX = e.offsetX;
-		mouseY = e.offsetY;
-	}
-	else if(e.layerX){
-		mouseX = e.layerX;
-		mouseY = e.layerY;
-	}
+	mouseX = e.clientX/document.body.style.zoom;
+	mouseY = e.clientY/document.body.style.zoom;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
  
@@ -473,34 +546,71 @@ function handleMouseUp(e){
 	mouseB-=e.button+1;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
- 
+ function mousezone(x,y,w,h){
+	if (mouseX>x)
+      if( mouseX<=(x+w))
+        if (mouseY>y)
+          if(mouseY<=(y+h))
+				return true;
+  return false;
+}
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+
 //touch code
  
-var touchB;
-var touchX;
-var touchY;
+var touchB =new Array();
+var touchX=new Array();
+var touchY=new Array();
 
  
 function handleTouchStart(e){ 
 	e.preventDefault();
 	mouseB = 1;
-	mouseX=e.touches[0].screenX;
-	mouseY=e.touches[0].screenY; 
-	}
+	mouseX=e.touches[0].clientX/document.body.style.zoom;
+	mouseY=e.touches[0].clientY/document.body.style.zoom;
+	for (var i=0;i<e.touches.length;i++){
+		touchB[i] = 1;
+		touchX[i]=e.touches[i].clientX/document.body.style.zoom;
+		touchY[i]=e.touches[i].clientY/document.body.style.zoom;
+	}	
+}
 //--------------------------------------------------------------------------------------------------------------------------------------------
  
 function handleTouchEnd(e){ 
 	e.preventDefault();
 	mouseB = 0;
+	for (var i=0;i<8;i++){
+		touchB[i] = 0;
+	}	
+
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
  
 function handleTouchMove(e){
 	e.preventDefault();
-	mouseX=e.changedTouches[0].screenX;
-	mouseY=e.changedTouches[0].screenY; 
+	mouseX=e.changedTouches[0].clientX/document.body.style.zoom;
+	mouseY=e.changedTouches[0].clientY/document.body.style.zoom; 
+	for (var i=0;i<e.touches.length;i++){
+		touchB[i] = 1;
+		touchX[i]=e.touches[i].clientX/document.body.style.zoom;
+		touchY[i]=e.touches[i].clientY/document.body.style.zoom;
+	}	
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+function touchzone(x,y,w,h){
+	for(var i=0;i<4;i++){  
+		if (touchX[i]>x)
+			if( touchX[i]<=(x+w))
+				if (touchY[i]>y)
+					if(touchY[i]<=(y+h))
+						return i;
+	}
+  return false;
+}
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
  
 //keyboard code
 //--------------------------------------------------------------------------------------------
@@ -615,18 +725,17 @@ document.onkeydown = handleKeyDown;
 document.onkeyup = handleKeyUp;
 
 var key=new Array();
+
 //attiva tastiera
 
 function handleKeyDown( e ){
-	//cross browser issues exist
-	if(!e){ var e = window.event; }
+	e = e || e.event;
 	key[e.keyCode]=1;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 function handleKeyUp( e ){
-	//cross browser issues exist
-	if(!e){ var e = window.event; }
+	e = e || e.event;
 	key[e.keyCode]=0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -638,9 +747,11 @@ function loadsound(filepath){
 	var sound= document.createElement("audio");
 	sound.src=filepath;
 	sound.autoplay="";
-	if (filepath.substr(filepath.length - 3,filepath.length)=="wav") sound.type="audio/wav";
-	if (filepath.substr(filepath.length - 3,filepath.length)=="ogg") sound.type="audio/ogg";
-	if (filepath.substr(filepath.length - 3,filepath.length)=="mp3") sound.type="audio/mp3";
+	sound.preload="auto";
+	sound.type='audio/ogg; codecs="opus"';
+	//if (filepath.substr(filepath.length - 3,filepath.length)=="wav") sound.type="audio/wav";
+	//if (filepath.substr(filepath.length - 3,filepath.length)=="ogg") sound.type="audio/ogg";
+	//if (filepath.substr(filepath.length - 3,filepath.length)=="mp3") sound.type="audio/mp3";
 	current.sound=sound;
 	return sound;
 }
@@ -659,4 +770,5 @@ current.col.background="#ffffff";
 current.size=16;
 
 setdisplay();
+document.write("<script src = 'main.js?"+Math.floor(Date.now() / 1000)+"'></script>");
  
