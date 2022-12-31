@@ -3,9 +3,7 @@ Simple Games Library javascript edition
 
 # SGL.JS reference
 
-// default
-
-
+// SCREEN
 //----------------------------------------------------------------------------------------------------------------------------
 
 function setdisplay( width, height)
@@ -18,27 +16,29 @@ UPDATE
 
 function _update()
 
+
 SURFACES
-//----------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------
 
 function createsurface(width,height)
 
 function loadsurface(filepath)
 
+function savearea(target,x,y,w,h)
+
+function savesurface(target) 
+
 function blt( target, xdest, ydest, wdest, hdest, surface, xsource, ysource, wsource, hsource)
 
-function paste( target, x, y, surface)
+function paste( target, x, y, surface, angle, zoom, alpha)
 
-// surfaces collisions
+function hit(surfacea, xa, ya, surfaceb, xb, yb, xa2, ya2, xb2, yb2) // surfaces collisions
 
-function hit(surfacea, xa, ya, surfaceb, xb, yb, xa2, ya2, xb2, yb2)
+function hitpp(surfacea, xa, ya, surfaceb, xb, yb, xa2, ya2, xb2, yb2) // pixel precision surfaces collisions
 
-// pixel precision surfaces collisions
-
-function hitpp(surfacea, xa, ya, surfaceb, xb, yb, xa2, ya2, xb2, yb2)
 
 GRAPHICS
-//--------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------
 
 function _hex(n){
 
@@ -66,16 +66,19 @@ function circle( target, vx, vy, r, col)
 
 function fillcircle( target, vx, vy, r, col)
 
+function paint(target, x, y, color)
 
-//text
-//------------------------------------------------------------------------------------------------------------------
+
+TEXT
+------------------------------------------------------------------------------------------------------------------
 
 function setfont(fnt){</p>
 
 function text ( target, x, y, size, col, txt)
 
-//mouse code
-//--------------------------------------------------------------------------------------------------------------------
+
+MOUSE
+--------------------------------------------------------------------------------------------------------------------
 
 var mouseX
 
@@ -89,7 +92,9 @@ function handleMouseDown( e)
 
 function handleMouseUp(e)
 
-//touch code
+
+TOUCH
+-------------------------------------------------------------------------------------------------------------------------
 
 var touchB
 
@@ -103,8 +108,9 @@ function handleTouchEnd(e)
 
 function handleTouchMove(e)
 
-//keyboard code
-//-------------------------------------------------------------------------------------------------------------------------
+
+KEYBOARD
+-------------------------------------------------------------------------------------------------------------------------
 
 var KEY_ESC = 27
 
@@ -317,8 +323,8 @@ var KEY_CLOSE_BRAKET = 221
 var KEY_SINGLE_QUOTE = 222
 
 
-// sound
-//-------------------------------------------------------------------------------------------------------------------------
+SOUND
+-------------------------------------------------------------------------------------------------------------------------
 
 function loadsound(filepath)
 
