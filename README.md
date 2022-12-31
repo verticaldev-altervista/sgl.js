@@ -8,13 +8,9 @@ SCREEN
 
 function setdisplay( width, height)
 
- SETFPS
- 
-function setfps(fps)
+function setfps(fps) // set frames per second
 
-UPDATE
-
-function _update()
+function _update() // main rutine of code
 
 
 SURFACES
