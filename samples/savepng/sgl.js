@@ -19,14 +19,10 @@ current.x1=10;
 current.y1=10;
 
 
-// Main screen
-//--------------------------------------------------------------------------------------------
+//                              Main screen
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 function setdisplay( width, height){
-	if (display!=''){
-		const parent = display.parentNode;
-		parent.removeChild(display);
-}
 	if (! width) var width=window.innerWidth-20;
 	if (! height)var height=window.innerHeight-20;
 	if (display!=""){
@@ -86,9 +82,6 @@ function _update(){
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
  
-//SURFACES
-//--------------------------------------------------------------------------------------------
-
 function createsurface(width,height){
 	if (width==null)width=current.canvas.width;
 	if (height==null)height=current.canvas.height;
@@ -122,22 +115,6 @@ function loadsurface(filepath){
 	current.filepath=filepath;
 	current.surface=surface;
 	return surface;	
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-function savearea(target,x,y,w,h){
-  var s=createsurface(320,320);
-  blt(s,0,0,w,h,target,x,y,w,h);
-  savesurface(s);
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-function savesurface(target) {
-  const imageData = target.toDataURL('image/png');
-  const a = document.createElement('a');
-  a.href = imageData;
-  a.download = 'surface.png';
-  a.click();
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -288,9 +265,9 @@ function hitpp(surfacea, xa, ya, surfaceb, xb, yb, zooma, zoomb, wa, ha, wb, hb)
 //--------------------------------------------------------------------------------------------------------------------------------------------
  
 
-// GRAPHICS
-//-------------------------------------------------------------------------------------------- 
-
+//                              GRAPHICS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+ 
 function _hex(n){
 	var h=n.toString(16);
 	if(h.length==1) h="0"+h;
@@ -486,62 +463,8 @@ function fillcircle( target, vx, vy, r, col){
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-function paint(target, x, y, color) {
-	var paintmap=new Array;
-	var xstart,ystart;
-	var src_col,col;
-	var pm;
-
-
-	xstart=x;
-	ystart=y;
-	src_col=getpixel(target,x,y);
-	putpixel(target,x,y,color);
-	col=getpixel(target,x,y);
-    pm=2;
-    if (col==src_col)return -1;
-
-    while(0==0) {
-	if (getpixel(target,x,y)== src_col) {
-		putpixel(target,x,y,color);
-		paintmap[y*target.width+x]=pm;
-    }
-
-	if (getpixel(target,x+1,y)==src_col && (x+1) < target.width) {
-	    x=x+1;
-	    pm=1;
-	}
-	else if (getpixel(target,x-1,y)==src_col && (x-1) >= 0 ) {
-	    x=x-1;
-	    pm=2;
-	}
-	else if (getpixel(target,x,y+1)==src_col && (y+1) < target.height) {
-	    y=y+1;
-	    pm=3;
-	}
-	else if (getpixel(target,x,y-1)==src_col && (y-1) >= 0) {
-	    y=y-1;
-	    pm=4;
-	}
-	else {
-		if (x==xstart && y==ystart)break;
-
-		if (paintmap[y*target.width+x]==1)
-			x=x-1;
-		else if (paintmap[y*target.width+x]==2)
-			x=x+1;
-		else if (paintmap[y*target.width+x]==3)
-			y=y-1;
-		else if (paintmap[y*target.width+x]==4)
-			y=y+1;
-		}
-	}
-    return 0;
-}
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 //text
-//--------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 var fontName="Arial";
 
@@ -574,15 +497,16 @@ function text ( target, x, y, size, col, txt){
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 //mouse code
-//--------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 var mouseX=0;
 var mouseY=0;
 var mouseB=0;
 
-function handleMouseMove( e){
-	mouseX = e.clientX/document.body.style.zoom;
-	mouseY = e.clientY/document.body.style.zoom;
+function handleMouseMove(e) {
+    var rect = display.getBoundingClientRect();
+    mouseX = (e.clientX - rect.left) / document.body.style.zoom+7;
+    mouseY = (e.clientY - rect.top) / document.body.style.zoom+7;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
  
@@ -607,7 +531,6 @@ function handleMouseUp(e){
 
 
 //touch code
-//--------------------------------------------------------------------------------------------
  
 var touchB =new Array();
 var touchX=new Array();
@@ -792,8 +715,6 @@ function handleKeyUp( e ){
  
 
 // sound
-//--------------------------------------------------------------------------------------------
-
  
 function loadsound(filepath){
 	var sound= document.createElement("audio");
@@ -821,6 +742,6 @@ current.col.foreground="#000000";
 current.col.background="#ffffff";
 current.size=16;
 
-setdisplay();
-document.write("<script src = 'main.js?"+Math.floor(Date.now() / 1000)+"'></script>");
+//setdisplay();
+//document.write("<script src = 'main.js?"+Math.floor(Date.now() / 1000)+"'></script>");
  
