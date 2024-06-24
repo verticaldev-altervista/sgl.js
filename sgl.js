@@ -102,19 +102,19 @@ function loadsurface(filepath){
 
 	var image= document.createElement("img");
 	var surface=document.createElement("canvas");
+
 	image.src=filepath;
 	image.onload=function(){
 		surface.width=image.width;
-		surface.height=image.height;
+		surface.height=image.height;	
 		var ctx=surface.getContext("2d");
 		ctx.drawImage(image,0,0);
+		return surface;
+		
+		current.filepath=filepath;
+		current.surface=surface;
 	}
-	surface.width=image.width;
-	surface.height=image.height;
-	
-	current.filepath=filepath;
-	current.surface=surface;
-	return surface;	
+	return surface;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
