@@ -719,14 +719,18 @@ function handleKeyUp( e ){
 function loadsound(filepath){
 	var sound= document.createElement("audio");
 	sound.src=filepath;
-	sound.autoplay="";
+    sound.autoplay="";
 	sound.preload="auto";
-	sound.type='audio/ogg; codecs="opus"';
-	//if (filepath.substr(filepath.length - 3,filepath.length)=="wav") sound.type="audio/wav";
-	//if (filepath.substr(filepath.length - 3,filepath.length)=="ogg") sound.type="audio/ogg";
-	//if (filepath.substr(filepath.length - 3,filepath.length)=="mp3") sound.type="audio/mp3";
-	current.sound=sound;
-	return sound;
+    sound.onload=function(){
+        sound.type='audio/ogg; codecs="opus"';
+        if (filepath.substr(filepath.length - 3,filepath.length)=="wav") sound.type="audio/wav";
+        if (filepath.substr(filepath.length - 3,filepath.length)=="ogg") sound.type="audio/ogg";
+        if (filepath.substr(filepath.length - 3,filepath.length)=="mp3") sound.type="audio/mp3";
+        current.sound=sound;
+        return sound;
+    }
+    return sound;
+
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
