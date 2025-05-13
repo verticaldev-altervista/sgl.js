@@ -18,7 +18,7 @@ for( i=0;i<8;i++){
  c[i]=rgb(0,0,128+(i*(128/8)));
 }
 
-function update() {
+async function update() {
  	cls(display,rgb(0,0,0));
 	for( i=0;i<8;i++){
      	x[i]-=vx[i];
@@ -26,3 +26,4 @@ function update() {
       text ( display, x[i], y[i], s[i], c[i], txt);
 	}
 }
+
